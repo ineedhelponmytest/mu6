@@ -7,7 +7,7 @@ ENVIRONMENT = "production"
 
 # KV Namespaces (create these with: wrangler kv:namespace create "MU6_DATA")
 # After creating, replace the id values below with your actual namespace IDs
-# [[kv_namespaces]]
-# binding = "MU6_DATA"
-# id = "883babb8068840419cc7702ba3b8238c"
-# preview_id = "085047bbe5034495be386f0136372696"
+[[kv_namespaces]]
+binding = "MU6_DATA"
+id = "883babb8068840419cc7702ba3b8238c"
+preview_id = "085047bbe5034495be386f0136372696"
