@@ -887,8 +887,27 @@ function showAddMenu() {
   }), 50);
 }
 
+/* ---- Client-side routing ---- */
+function initRouter() {
+  // Handle navigation clicks - convert .html links to clean URLs
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[href]");
+    if (!link) return;
+    const href = link.getAttribute("href");
+    // Skip external links, anchors, and already-clean URLs
+    if (href.startsWith("http") || href.startsWith("#")) return;
+    // Convert .html links to clean URLs
+    if (href.endsWith(".html")) {
+      e.preventDefault();
+      const cleanUrl = href === "index.html" ? "/" : href.replace(".html", "");
+      window.location.href = cleanUrl;
+    }
+  });
+}
+
 /* ---- Boot ---- */
 document.addEventListener("DOMContentLoaded", () => {
+  initRouter();
   const page = document.body.dataset.page;
   if (!page || page === "home") initHomepage();
   // Other pages init their own functions

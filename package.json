@@ -9,7 +9,7 @@
     "deploy:preview": "wrangler pages deploy . --branch preview"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^3.114.17"
   },
   "engines": {
     "node": ">=18.0.0"
