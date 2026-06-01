@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – MU6</title>
+  <meta name="description" content="Your personal MU6 dashboard. Track discoveries, manage playlists, view favorites, and complete challenges." />
+  <meta name="theme-color" content="#8b5cf6" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body data-page="dashboard">
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="discover.html">Discover</a></li>
+      <li><a href="artists.html">Artists</a></li>
+      <li><a href="playlists.html">Playlists</a></li>
+      <li><a href="community.html">Community</a></li>
+    </ul>
+    <div class="nav-actions" id="navActions">
+      <button class="btn-ghost" onclick="openModal('loginModal')">Log In</button>
+      <button class="btn-primary" onclick="openModal('signupModal')">Sign Up</button>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- Not logged in state -->
+<div id="notLoggedIn" class="hidden" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding-top:var(--nav-height)">
+  <div style="text-align:center;max-width:480px;padding:40px">
+    <div style="font-size:64px;margin-bottom:24px">🎵</div>
+    <h1 style="font-size:32px;margin-bottom:12px">Your Dashboard</h1>
+    <p style="color:var(--text-secondary);margin-bottom:32px">Log in or create an account to access your personal music dashboard, track your discoveries, and manage your playlists.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn-primary" onclick="openModal('loginModal')">Log In</button>
+      <button class="btn-ghost" onclick="openModal('signupModal')">Sign Up Free</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Layout -->
+<div class="dashboard-layout" id="dashboardLayout" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-user" id="sidebarUser">
+      <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+      <div>
+        <div class="sidebar-username" id="sidebarUsername">Loading…</div>
+        <div class="sidebar-level" id="sidebarLevel">New Listener</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-link active" onclick="showDashSection('overview',this)">
+        <span class="icon">🏠</span> Overview
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('discoveries',this)">
+        <span class="icon">🔍</span> Discoveries
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('favorites',this)">
+        <span class="icon">❤️</span> Favorites
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('following',this)">
+        <span class="icon">💜</span> Following
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('playlists',this)">
+        <span class="icon">🎧</span> My Playlists
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('reviews',this)">
+        <span class="icon">✍️</span> My Reviews
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('challenges',this)">
+        <span class="icon">🏆</span> Challenges
+      </div>
+      <div class="sidebar-link" onclick="showDashSection('settings',this)">
+        <span class="icon">⚙️</span> Settings
+      </div>
+      <div class="sidebar-link" style="margin-top:16px;color:var(--text-muted)" onclick="handleLogout()">
+        <span class="icon">🚪</span> Log Out
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+
+    <!-- Overview Section -->
+    <div id="dash-overview">
+      <div class="dashboard-greeting">
+        <h1>Welcome back, <span id="greetingName" class="gradient-text">Explorer</span> 👋</h1>
+        <p id="greetingDate" style="color:var(--text-secondary)"></p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="dashboard-grid" id="dashStatsGrid"></div>
+
+      <!-- Two-column layout -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px">
+        <!-- Recent Activity -->
+        <div>
+          <div class="section-header" style="margin-bottom:16px">
+            <div><span class="section-label">🕐 Recent</span><h3 style="font-size:18px;font-weight:700">Recent Activity</h3></div>
+          </div>
+          <div id="recentActivityList"></div>
+        </div>
+
+        <!-- Genre Breakdown -->
+        <div>
+          <div class="section-header" style="margin-bottom:16px">
+            <div><span class="section-label">🎵 Stats</span><h3 style="font-size:18px;font-weight:700">Genre Breakdown</h3></div>
+          </div>
+          <div id="genreBreakdown"></div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div>
+        <div class="section-header" style="margin-bottom:16px">
+          <div><span class="section-label">⚡ Quick</span><h3 style="font-size:18px;font-weight:700">Quick Actions</h3></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+          <button class="glass" style="border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color var(--transition)" onclick="openAddArtistModal()" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+            <div style="font-size:28px;margin-bottom:8px">🎤</div>
+            <div style="font-size:14px;font-weight:600">Add Artist</div>
+          </button>
+          <button class="glass" style="border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color var(--transition)" onclick="openAddSongModal()" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+            <div style="font-size:28px;margin-bottom:8px">🎵</div>
+            <div style="font-size:14px;font-weight:600">Add Song</div>
+          </button>
+          <button class="glass" style="border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color var(--transition)" onclick="openAddAlbumModal()" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+            <div style="font-size:28px;margin-bottom:8px">💿</div>
+            <div style="font-size:14px;font-weight:600">Add Album</div>
+          </button>
+          <a href="playlists.html" class="glass" style="border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color var(--transition);display:block" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+            <div style="font-size:28px;margin-bottom:8px">🎧</div>
+            <div style="font-size:14px;font-weight:600">Create Playlist</div>
+          </a>
+          <a href="discover.html" class="glass" style="border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color var(--transition);display:block" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+            <div style="font-size:28px;margin-bottom:8px">🔍</div>
+            <div style="font-size:14px;font-weight:600">Discover Music</div>
+          </a>
+          <a href="community.html" class="glass" style="border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:border-color var(--transition);display:block" onmouseover="this.style.borderColor='var(--border-hover)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+            <div style="font-size:28px;margin-bottom:8px">✍️</div>
+            <div style="font-size:14px;font-weight:600">Write Review</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discoveries Section -->
+    <div id="dash-discoveries" class="hidden">
+      <div class="dashboard-greeting">
+        <h1>🔍 My Discoveries</h1>
+        <p style="color:var(--text-secondary)">Music you've explored on MU6</p>
+      </div>
+      <div id="discoveriesContent"></div>
+    </div>
+
+    <!-- Favorites Section -->
+    <div id="dash-favorites" class="hidden">
+      <div class="dashboard-greeting">
+        <h1>❤️ Favorites</h1>
+        <p style="color:var(--text-secondary)">Songs you've saved</p>
+      </div>
+      <div id="favoritesContent"></div>
+    </div>
+
+    <!-- Following Section -->
+    <div id="dash-following" class="hidden">
+      <div class="dashboard-greeting">
+        <h1>💜 Following</h1>
+        <p style="color:var(--text-secondary)">Artists you follow</p>
+      </div>
+      <div id="followingContent"></div>
+    </div>
+
+    <!-- My Playlists Section -->
+    <div id="dash-playlists" class="hidden">
+      <div class="dashboard-greeting" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h1>🎧 My Playlists</h1>
+          <p style="color:var(--text-secondary)">Playlists you've created</p>
+        </div>
+        <a href="playlists.html" class="btn-primary">+ Create Playlist</a>
+      </div>
+      <div id="myPlaylistsContent"></div>
+    </div>
+
+    <!-- My Reviews Section -->
+    <div id="dash-reviews" class="hidden">
+      <div class="dashboard-greeting">
+        <h1>✍️ My Reviews</h1>
+        <p style="color:var(--text-secondary)">Albums you've reviewed</p>
+      </div>
+      <div id="myReviewsContent"></div>
+    </div>
+
+    <!-- Challenges Section -->
+    <div id="dash-challenges" class="hidden">
+      <div class="dashboard-greeting">
+        <h1>🏆 Challenges</h1>
+        <p style="color:var(--text-secondary)">Complete challenges to earn badges</p>
+      </div>
+      <div id="challengesContent" class="features-grid"></div>
+    </div>
+
+    <!-- Settings Section -->
+    <div id="dash-settings" class="hidden">
+      <div class="dashboard-greeting">
+        <h1>⚙️ Settings</h1>
+        <p style="color:var(--text-secondary)">Manage your account</p>
+      </div>
+      <div id="settingsContent"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Auth Modals -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal glass">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <div class="modal-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></div>
+    <h2>Welcome Back</h2>
+    <p class="modal-sub">Log in to access your dashboard</p>
+    <form class="modal-form" onsubmit="handleLogin(event)">
+      <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com" required /></div>
+      <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••" required /></div>
+      <button type="submit" class="btn-primary full-width">Log In</button>
+    </form>
+    <p class="modal-switch">Don't have an account? <a href="#" onclick="switchModal('loginModal','signupModal')">Sign Up</a></p>
+  </div>
+</div>
+<div class="modal-overlay" id="signupModal">
+  <div class="modal glass">
+    <button class="modal-close" onclick="closeModal('signupModal')">✕</button>
+    <div class="modal-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></div>
+    <h2>Join MU6</h2>
+    <p class="modal-sub">Start discovering music you'll love</p>
+    <form class="modal-form" onsubmit="handleSignup(event)">
+      <div class="form-group"><label>Username</label><input type="text" placeholder="musiclover42" required /></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com" required /></div>
+      <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••" required /></div>
+      <button type="submit" class="btn-primary full-width">Create Account</button>
+    </form>
+    <p class="modal-switch">Already have an account? <a href="#" onclick="switchModal('signupModal','loginModal')">Log In</a></p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+/* ---- Dashboard Logic ---- */
+document.addEventListener("DOMContentLoaded", () => {
+  initNavbar();
+  const user = MU6Store.currentUser();
+  if (!user) {
+    document.getElementById("notLoggedIn").classList.remove("hidden");
+    document.getElementById("dashboardLayout").style.display = "none";
+    updateAuthUI();
+    return;
+  }
+  document.getElementById("notLoggedIn").classList.add("hidden");
+  document.getElementById("dashboardLayout").style.display = "grid";
+  updateAuthUI();
+  initDashboard(user);
+});
+
+function initDashboard(user) {
+  // Sidebar
+  document.getElementById("sidebarAvatar").textContent = user.username[0].toUpperCase();
+  document.getElementById("sidebarAvatar").style.background = MU6Data.avatarColors[Math.abs(hashCode(user.id)) % MU6Data.avatarColors.length];
+  document.getElementById("sidebarUsername").textContent = user.username;
+  document.getElementById("sidebarLevel").textContent = user.level;
+
+  // Greeting
+  document.getElementById("greetingName").textContent = user.username;
+  const now = new Date();
+  document.getElementById("greetingDate").textContent = now.toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+  showDashSection("overview", document.querySelector(".sidebar-link"));
+}
+
+function showDashSection(section, link) {
+  document.querySelectorAll(".sidebar-link").forEach(l => l.classList.remove("active"));
+  if (link) link.classList.add("active");
+
+  document.querySelectorAll("[id^='dash-']").forEach(el => el.classList.add("hidden"));
+  const target = document.getElementById("dash-" + section);
+  if (target) target.classList.remove("hidden");
+
+  // Render section content
+  const user = MU6Store.currentUser();
+  if (!user) return;
+
+  if (section === "overview") renderOverview(user);
+  else if (section === "discoveries") renderDiscoveriesSection(user);
+  else if (section === "favorites") renderFavoritesSection(user);
+  else if (section === "following") renderFollowingSection(user);
+  else if (section === "playlists") renderMyPlaylistsSection(user);
+  else if (section === "reviews") renderMyReviewsSection(user);
+  else if (section === "challenges") renderChallengesSection(user);
+  else if (section === "settings") renderSettingsSection(user);
+}
+
+/* ---- Overview ---- */
+function renderOverview(user) {
+  const stats = MU6Store.getUserStats();
+  const siteStats = MU6Store.getSiteStats();
+
+  // Stats cards
+  const statCards = [
+    { icon: "🔍", num: stats.discovered, label: "Discoveries" },
+    { icon: "❤️", num: stats.saved, label: "Favorites" },
+    { icon: "🎧", num: stats.playlists, label: "Playlists" },
+    { icon: "✍️", num: stats.reviews, label: "Reviews" },
+    { icon: "💜", num: stats.following, label: "Following" },
+    { icon: "🎵", num: siteStats.songs, label: "Total Songs" },
+  ];
+  document.getElementById("dashStatsGrid").innerHTML = statCards.map(s => `
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon">${s.icon}</div>
+      <div class="dash-stat-num">${formatCount(s.num)}</div>
+      <div class="dash-stat-label">${s.label}</div>
+    </div>`).join("");
+
+  // Recent activity (history)
+  const history = MU6Store.getHistory().slice(0, 8);
+  const activityContainer = document.getElementById("recentActivityList");
+  if (!history.length) {
+    activityContainer.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px 0">No activity yet. Start exploring!</div>`;
+  } else {
+    activityContainer.innerHTML = history.map(h => {
+      let item, icon;
+      if (h.type === "song") { item = MU6Store.getSong(h.id); icon = item?.emoji || "🎵"; }
+      else if (h.type === "artist") { item = MU6Store.getArtist(h.id); icon = item?.emoji || "🎤"; }
+      else if (h.type === "album") { item = MU6Store.getAlbum(h.id); icon = item?.emoji || "💿"; }
+      if (!item) return "";
+      const name = item.title || item.name;
+      const sub = item.artistName || (item.genres||[]).join(", ") || "";
+      const time = formatRelativeTime(new Date(h.ts).toISOString());
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${escHtml(sub)}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);flex-shrink:0">${time}</div>
+      </div>`;
+    }).filter(Boolean).join("");
+  }
+
+  // Genre breakdown
+  const counts = MU6Store.getGenreCounts();
+  const total = Object.values(counts).reduce((a,b) => a+b, 0);
+  const genreContainer = document.getElementById("genreBreakdown");
+  if (!total) {
+    genreContainer.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:16px 0">No genre data yet. Add songs to see your breakdown.</div>`;
+  } else {
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,6);
+    genreContainer.innerHTML = sorted.map(([genre, count]) => {
+      const pct = Math.round((count/total)*100);
+      const g = MU6Data.genres.find(x => x.name === genre);
+      const color = g?.bg || "#8b5cf6";
+      return `<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span>${g?.emoji||"🎵"} ${genre}</span>
+          <span style="color:var(--text-muted)">${count} tracks (${pct}%)</span>
+        </div>
+        <div style="background:var(--bg-secondary);border-radius:var(--radius-full);height:6px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:var(--radius-full);transition:width 0.5s ease"></div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+}
+
+/* ---- Discoveries ---- */
+function renderDiscoveriesSection(user) {
+  const history = MU6Store.getHistory();
+  const container = document.getElementById("discoveriesContent");
+  if (!history.length) {
+    container.innerHTML = renderEmptyState("🔍", "No discoveries yet",
+      "Start exploring music on MU6 and your history will appear here.",
+      `<a href="discover.html" class="btn-primary">Start Discovering</a>`);
+    return;
+  }
+  const items = history.map(h => {
+    let item;
+    if (h.type === "song") item = MU6Store.getSong(h.id);
+    else if (h.type === "artist") item = MU6Store.getArtist(h.id);
+    else if (h.type === "album") item = MU6Store.getAlbum(h.id);
+    return item ? { ...item, _type: h.type, _ts: h.ts } : null;
+  }).filter(Boolean);
+
+  container.innerHTML = `<div class="track-list">${items.map((item, i) => {
+    const name = item.title || item.name;
+    const sub = item.artistName || (item.genres||[]).join(", ") || "";
+    const typeLabel = item._type === "song" ? "🎵 Song" : item._type === "artist" ? "🎤 Artist" : "💿 Album";
+    return `<div class="track-item">
+      <span class="track-num">${i+1}</span>
+      <div class="track-art">${item.emoji}</div>
+      <div class="track-info">
+        <div class="track-name">${escHtml(name)}</div>
+        <div class="track-artist">${escHtml(sub)}</div>
+      </div>
+      <span class="card-badge">${typeLabel}</span>
+      <span class="track-duration">${formatRelativeTime(new Date(item._ts).toISOString())}</span>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+/* ---- Favorites ---- */
+function renderFavoritesSection(user) {
+  const favorites = MU6Store.getFavorites();
+  const container = document.getElementById("favoritesContent");
+  if (!favorites.length) {
+    container.innerHTML = renderEmptyState("❤️", "No favorites yet",
+      "Heart songs you love and they'll appear here.",
+      `<a href="discover.html" class="btn-primary">Discover Songs</a>`);
+    return;
+  }
+  container.innerHTML = `<div class="track-list">${favorites.map((s, i) => `
+    <div class="track-item">
+      <span class="track-num">${i+1}</span>
+      <div class="track-art">${s.emoji}</div>
+      <div class="track-info">
+        <div class="track-name">${escHtml(s.title)}</div>
+        <div class="track-artist">${escHtml(s.artistName)}</div>
+      </div>
+      <span class="track-duration">${s.duration||"—"}</span>
+      <div class="track-actions">
+        ${renderStreamingLinks(s.streamingLinks)}
+        <button class="track-btn" onclick="toggleFav('${s.id}',this);renderFavoritesSection(MU6Store.currentUser())">❤️</button>
+      </div>
+    </div>`).join("")}</div>`;
+}
+
+/* ---- Following ---- */
+function renderFollowingSection(user) {
+  const followed = MU6Store.getFollowedArtists();
+  const container = document.getElementById("followingContent");
+  if (!followed.length) {
+    container.innerHTML = renderEmptyState("💜", "Not following anyone yet",
+      "Follow artists you love to keep track of them.",
+      `<a href="artists.html" class="btn-primary">Browse Artists</a>`);
+    return;
+  }
+  container.innerHTML = `<div class="cards-grid">${followed.map(a => `
+    <div class="card" onclick="window.location='artists.html?id=${a.id}'">
+      <div class="card-image-placeholder" style="background:${getArtistGradient(a.id)};font-size:48px">${a.emoji}</div>
+      <div class="card-body">
+        <div class="card-title">${escHtml(a.name)}</div>
+        <div class="card-sub">${escHtml((a.genres||[]).join(", "))}</div>
+        <div class="card-meta">
+          <span class="card-badge">${formatCount(a.followers)} followers</span>
+          <button class="track-btn" onclick="event.stopPropagation();MU6Store.toggleFollow('${a.id}');renderFollowingSection(MU6Store.currentUser())" title="Unfollow">💜</button>
+        </div>
+      </div>
+    </div>`).join("")}</div>`;
+}
+
+/* ---- My Playlists ---- */
+function renderMyPlaylistsSection(user) {
+  const playlists = MU6Store.getPlaylists().filter(p => p.ownerId === user.id);
+  const container = document.getElementById("myPlaylistsContent");
+  if (!playlists.length) {
+    container.innerHTML = renderEmptyState("🎧", "No playlists yet",
+      "Create your first playlist and start curating music.",
+      `<a href="playlists.html" class="btn-primary">Create Playlist</a>`);
+    return;
+  }
+  container.innerHTML = `<div class="playlists-grid">${playlists.map(p => {
+    const songs = MU6Store.getSongs().filter(s => p.songs.includes(s.id)).slice(0,4);
+    const cells = [0,1,2,3].map(i => `<div class="playlist-cover-cell">${songs[i]?songs[i].emoji:"🎵"}</div>`).join("");
+    return `<div class="playlist-card" onclick="window.location='playlists.html?id=${p.id}'">
+      <div class="playlist-cover">${cells}</div>
+      <div class="playlist-body">
+        <div class="playlist-title">${escHtml(p.title)}</div>
+        <div class="playlist-meta">
+          <span>${p.songs.length} tracks</span>
+          <span class="playlist-dot"></span>
+          <span style="text-transform:capitalize">${p.category}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+/* ---- My Reviews ---- */
+function renderMyReviewsSection(user) {
+  const reviews = MU6Store.getReviews().filter(r => r.userId === user.id);
+  const container = document.getElementById("myReviewsContent");
+  if (!reviews.length) {
+    container.innerHTML = renderEmptyState("✍️", "No reviews yet",
+      "Share your thoughts on albums you've listened to.",
+      `<a href="community.html" class="btn-primary">Write a Review</a>`);
+    return;
+  }
+  container.innerHTML = reviews.slice().reverse().map(r => `
+    <div class="review-card" style="margin-bottom:16px">
+      <div class="review-header">
+        <div class="review-avatar" style="background:${MU6Data.avatarColors[0]}">${r.userInitial}</div>
+        <div>
+          <div class="review-user">${escHtml(r.username)}</div>
+          <div class="review-date">${formatRelativeTime(r.createdAt)}</div>
+        </div>
+      </div>
+      ${renderStars(r.rating)}
+      <p class="review-text">${escHtml(r.text)}</p>
+      <div class="review-album">
+        <div class="review-album-art">${r.albumEmoji||"💿"}</div>
+        <div>
+          <div class="review-album-name">${escHtml(r.albumTitle)}</div>
+          <div class="review-album-artist">${escHtml(r.albumArtist)}</div>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+/* ---- Challenges ---- */
+function renderChallengesSection(user) {
+  const stats = MU6Store.getUserStats();
+  const container = document.getElementById("challengesContent");
+  container.innerHTML = MU6Data.challenges.map(c => {
+    let progress = 0;
+    if (c.title === "Genre Explorer") progress = Math.min(c.total, stats.discovered);
+    else if (c.title === "Hidden Gem Hunter") progress = Math.min(c.total, stats.following);
+    else if (c.title === "Review Writer") progress = Math.min(c.total, stats.reviews);
+    else if (c.title === "Playlist Builder") progress = Math.min(c.total, stats.playlists);
+    const pct = Math.round((progress/c.total)*100);
+    const done = progress >= c.total;
+    return `<div class="feature-card glass" style="${done?"border-color:rgba(16,185,129,0.4)":""}">
+      <div class="feature-icon">${done?"✅":c.reward.split(" ")[0]}</div>
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <div style="background:var(--bg-secondary);border-radius:var(--radius-full);height:6px;margin-bottom:12px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--gradient);border-radius:var(--radius-full);transition:width 0.5s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--text-muted)">${progress}/${c.total}${done?" ✓":""}</span>
+        <span style="font-size:12px;color:var(--purple-light);font-weight:600">${c.reward}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---- Settings ---- */
+function renderSettingsSection(user) {
+  const container = document.getElementById("settingsContent");
+  container.innerHTML = `
+    <div style="max-width:560px">
+      <div class="glass" style="border-radius:var(--radius-xl);padding:32px;margin-bottom:24px">
+        <h3 style="margin-bottom:20px;font-size:18px">👤 Profile</h3>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+          <div style="width:64px;height:64px;border-radius:50%;background:${MU6Data.avatarColors[Math.abs(hashCode(user.id))%MU6Data.avatarColors.length]};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff">${user.username[0].toUpperCase()}</div>
+          <div>
+            <div style="font-size:18px;font-weight:700">${escHtml(user.username)}</div>
+            <div style="font-size:13px;color:var(--text-muted)">${escHtml(user.email)}</div>
+            <div style="font-size:12px;color:var(--purple-light);margin-top:4px">${user.level}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-secondary);font-size:14px">Member since</span>
+            <span style="font-size:14px">${new Date(user.joinedAt).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-secondary);font-size:14px">Username</span>
+            <span style="font-size:14px">${escHtml(user.username)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:12px 0">
+            <span style="color:var(--text-secondary);font-size:14px">Email</span>
+            <span style="font-size:14px">${escHtml(user.email)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass" style="border-radius:var(--radius-xl);padding:32px;margin-bottom:24px">
+        <h3 style="margin-bottom:20px;font-size:18px">🔒 Account</h3>
+        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px">Manage your account security and preferences.</p>
+        <button class="btn-ghost" style="width:100%;margin-bottom:12px" onclick="showToast('Password change coming soon!','success')">Change Password</button>
+        <button class="btn-ghost" style="width:100%;color:var(--pink);border-color:rgba(236,72,153,0.3)" onclick="confirmDeleteAccount()">Delete Account</button>
+      </div>
+
+      <div class="glass" style="border-radius:var(--radius-xl);padding:32px">
+        <h3 style="margin-bottom:20px;font-size:18px">🚪 Session</h3>
+        <button class="btn-primary" style="width:100%" onclick="handleLogout()">Log Out</button>
+      </div>
+    </div>`;
+}
+
+function confirmDeleteAccount() {
+  if (confirm("Are you sure you want to delete your account? This cannot be undone.")) {
+    const state = MU6Store.load();
+    const user = MU6Store.currentUser();
+    if (!user) return;
+    MU6Store.set(s => ({
+      ...s,
+      users: s.users.filter(u => u.id !== user.id),
+      currentUser: null,
+    }));
+    showToast("Account deleted.", "success");
+    setTimeout(() => window.location.href = "index.html", 1500);
+  }
+}
+
+/* ---- Helpers ---- */
+function formatRelativeTime(isoString) {
+  const diff = Date.now() - new Date(isoString).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(isoString).toLocaleDateString("en-US", { month:"short", day:"numeric" });
+}
+
+// After login, reload dashboard
+const _origUpdateAuthUI = updateAuthUI;
+function updateAuthUI() {
+  _origUpdateAuthUI();
+  const user = MU6Store.currentUser();
+  if (user) {
+    document.getElementById("notLoggedIn").classList.add("hidden");
+    document.getElementById("dashboardLayout").style.display = "grid";
+    initDashboard(user);
+  } else {
+    document.getElementById("notLoggedIn").classList.remove("hidden");
+    document.getElementById("dashboardLayout").style.display = "none";
+  }
+}
+</script>
+</body>
+</html>

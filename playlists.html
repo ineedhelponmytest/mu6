@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Playlists – MU6</title>
+  <meta name="description" content="Browse and create music playlists on MU6. Curate your perfect soundtrack and share it with the community." />
+  <meta name="theme-color" content="#8b5cf6" />
+  <link rel="canonical" href="https://mu6.pages.dev/playlists.html" />
+  <meta property="og:title" content="Playlists – MU6" />
+  <meta property="og:description" content="Browse and create music playlists on MU6." />
+  <meta property="og:url" content="https://mu6.pages.dev/playlists.html" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body data-page="playlists">
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="discover.html">Discover</a></li>
+      <li><a href="artists.html">Artists</a></li>
+      <li><a href="playlists.html" class="active">Playlists</a></li>
+      <li><a href="community.html">Community</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="openModal('loginModal')">Log In</button>
+      <button class="btn-primary" onclick="openModal('signupModal')">Sign Up</button>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- Playlist Detail View -->
+<div id="playlistDetailView" class="hidden">
+  <div style="padding-top:var(--nav-height)">
+    <div style="background:var(--bg-secondary);padding:60px 0 40px;border-bottom:1px solid var(--border)">
+      <div class="container">
+        <a href="playlists.html" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px;margin-bottom:24px">← All Playlists</a>
+        <div style="display:flex;gap:32px;align-items:flex-end;flex-wrap:wrap">
+          <div id="playlistDetailCover" style="width:180px;height:180px;border-radius:var(--radius-xl);overflow:hidden;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--bg-card)"></div>
+          <div>
+            <span class="section-label">🎧 Playlist</span>
+            <h1 id="playlistDetailTitle" style="font-size:clamp(28px,4vw,52px);margin-bottom:8px"></h1>
+            <p id="playlistDetailMeta" style="color:var(--text-secondary);margin-bottom:20px"></p>
+            <p id="playlistDetailDesc" style="color:var(--text-secondary);font-size:14px;max-width:480px;margin-bottom:20px"></p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap" id="playlistDetailActions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="padding:40px 0 100px">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:40px">
+        <div>
+          <div class="section-header" style="margin-bottom:24px">
+            <div><span class="section-label">🎵 Tracks</span><h2 class="section-title" id="playlistTrackCount">0 Songs</h2></div>
+            <button class="btn-outline" id="addToPlaylistBtn" onclick="openAddToPlaylistModal()">+ Add Song</button>
+          </div>
+          <div id="playlistTrackList"></div>
+        </div>
+        <div>
+          <div class="glass" style="border-radius:var(--radius-xl);padding:24px">
+            <h3 style="margin-bottom:16px;font-size:16px">📋 Details</h3>
+            <div id="playlistDetailInfo" style="display:flex;flex-direction:column;gap:12px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Playlists List View -->
+<div id="playlistsListView">
+  <section class="playlists-hero">
+    <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(139,92,246,0.12) 0%,transparent 70%);pointer-events:none"></div>
+    <div class="container" style="position:relative">
+      <span class="section-label">🎧 Playlists</span>
+      <h1 style="font-size:clamp(36px,5vw,64px);margin-bottom:16px">Explore <span class="gradient-text">Playlists</span></h1>
+      <p style="font-size:18px;color:var(--text-secondary);max-width:560px;margin:0 auto 40px">Browse community playlists or create your own. Curate the perfect soundtrack.</p>
+      <button class="btn-primary" onclick="openCreatePlaylistModal()">🎧 Create Playlist</button>
+    </div>
+  </section>
+
+  <div class="container" style="padding-bottom:100px">
+    <!-- Category Tabs -->
+    <div class="playlist-tabs" style="margin-bottom:32px">
+      <button class="ptab active" data-cat="all" onclick="filterPlaylists('all',this)">All</button>
+      <button class="ptab" data-cat="community" onclick="filterPlaylists('community',this)">Community</button>
+      <button class="ptab" data-cat="curated" onclick="filterPlaylists('curated',this)">Curated</button>
+      <button class="ptab" data-cat="genre" onclick="filterPlaylists('genre',this)">Genre</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrapper" style="margin-bottom:32px;max-width:480px">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="playlistSearch" placeholder="Search playlists…" oninput="filterPlaylistsBySearch()" />
+    </div>
+
+    <div class="playlists-grid" id="playlistsMainGrid"></div>
+    <div id="playlistsEmpty"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></a>
+        <p>The next-generation music discovery platform.</p>
+      </div>
+      <div class="footer-col"><h4>Discover</h4><ul>
+        <li><a href="discover.html">Discovery Engine</a></li>
+        <li><a href="artists.html">Artists</a></li>
+        <li><a href="playlists.html">Playlists</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Community</h4><ul>
+        <li><a href="community.html">Reviews</a></li>
+        <li><a href="community.html">Discussions</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Account</h4><ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="#" onclick="openModal('loginModal')">Log In</a></li>
+        <li><a href="#" onclick="openModal('signupModal')">Sign Up</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MU6. All rights reserved.</p>
+      <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- Auth Modals -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal glass">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <div class="modal-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></div>
+    <h2>Welcome Back</h2>
+    <p class="modal-sub">Log in to continue your music journey</p>
+    <form class="modal-form" onsubmit="handleLogin(event)">
+      <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com" required /></div>
+      <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••" required /></div>
+      <button type="submit" class="btn-primary full-width">Log In</button>
+    </form>
+    <p class="modal-switch">Don't have an account? <a href="#" onclick="switchModal('loginModal','signupModal')">Sign Up</a></p>
+  </div>
+</div>
+<div class="modal-overlay" id="signupModal">
+  <div class="modal glass">
+    <button class="modal-close" onclick="closeModal('signupModal')">✕</button>
+    <div class="modal-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></div>
+    <h2>Join MU6</h2>
+    <p class="modal-sub">Start discovering music you'll love</p>
+    <form class="modal-form" onsubmit="handleSignup(event)">
+      <div class="form-group"><label>Username</label><input type="text" placeholder="musiclover42" required /></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com" required /></div>
+      <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••" required /></div>
+      <button type="submit" class="btn-primary full-width">Create Account</button>
+    </form>
+    <p class="modal-switch">Already have an account? <a href="#" onclick="switchModal('signupModal','loginModal')">Log In</a></p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+/* ---- Playlists Page Logic ---- */
+let _activeCatFilter = "all";
+let _currentPlaylistId = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  initNavbar();
+  updateAuthUI();
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get("id");
+  if (pid) showPlaylistDetail(pid);
+  else renderPlaylistsList();
+});
+
+/* ---- List View ---- */
+function renderPlaylistsList() {
+  document.getElementById("playlistsListView").classList.remove("hidden");
+  document.getElementById("playlistDetailView").classList.add("hidden");
+  filterPlaylists(_activeCatFilter, document.querySelector(`.ptab[data-cat="${_activeCatFilter}"]`) || document.querySelector(".ptab"));
+}
+
+function filterPlaylists(cat, btn) {
+  _activeCatFilter = cat;
+  document.querySelectorAll(".ptab").forEach(t => t.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  applyPlaylistFilters();
+}
+
+function filterPlaylistsBySearch() { applyPlaylistFilters(); }
+
+function applyPlaylistFilters() {
+  const q = document.getElementById("playlistSearch")?.value.toLowerCase() || "";
+  let playlists = MU6Store.getPlaylists();
+  if (_activeCatFilter !== "all") playlists = playlists.filter(p => p.category === _activeCatFilter);
+  if (q) playlists = playlists.filter(p => p.title.toLowerCase().includes(q) || p.ownerName.toLowerCase().includes(q));
+  renderPlaylistsGrid(playlists);
+}
+
+function renderPlaylistsGrid(playlists) {
+  const grid = document.getElementById("playlistsMainGrid");
+  const empty = document.getElementById("playlistsEmpty");
+  if (!grid) return;
+  if (!playlists.length) {
+    grid.innerHTML = "";
+    empty.innerHTML = renderEmptyState("🎧", "No playlists yet",
+      "Create the first playlist and start curating music for the community.",
+      `<button class="btn-primary" onclick="openCreatePlaylistModal()">Create Playlist</button>`);
+    return;
+  }
+  empty.innerHTML = "";
+  grid.innerHTML = playlists.map(p => {
+    const songs = MU6Store.getSongs().filter(s => p.songs.includes(s.id)).slice(0,4);
+    const cells = [0,1,2,3].map(i => `<div class="playlist-cover-cell">${songs[i]?songs[i].emoji:"🎵"}</div>`).join("");
+    return `<div class="playlist-card" onclick="showPlaylistDetail('${p.id}')">
+      <div class="playlist-cover">${cells}</div>
+      <div class="playlist-body">
+        <div class="playlist-title">${escHtml(p.title)}</div>
+        <div class="playlist-meta">
+          <span>${p.songs.length} tracks</span>
+          <span class="playlist-dot"></span>
+          <span>by ${escHtml(p.ownerName)}</span>
+          <span class="playlist-dot"></span>
+          <span style="text-transform:capitalize">${p.category}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---- Detail View ---- */
+function showPlaylistDetail(playlistId) {
+  const playlist = MU6Store.getPlaylist(playlistId);
+  if (!playlist) { renderPlaylistsList(); return; }
+  _currentPlaylistId = playlistId;
+
+  document.getElementById("playlistsListView").classList.add("hidden");
+  document.getElementById("playlistDetailView").classList.remove("hidden");
+
+  // Cover
+  const songs = MU6Store.getSongs().filter(s => playlist.songs.includes(s.id));
+  const coverCells = [0,1,2,3].map(i => `<div class="playlist-cover-cell" style="font-size:36px">${songs[i]?songs[i].emoji:"🎵"}</div>`).join("");
+  document.getElementById("playlistDetailCover").innerHTML = coverCells;
+
+  // Header
+  document.getElementById("playlistDetailTitle").textContent = playlist.title;
+  document.getElementById("playlistDetailMeta").textContent = `${songs.length} songs · by ${playlist.ownerName} · ${playlist.category}`;
+  document.getElementById("playlistDetailDesc").textContent = playlist.description || "";
+
+  // Actions
+  const user = MU6Store.currentUser();
+  const isOwner = user && user.id === playlist.ownerId;
+  document.getElementById("playlistDetailActions").innerHTML = isOwner
+    ? `<button class="btn-primary" onclick="openAddToPlaylistModal()">+ Add Song</button>`
+    : `<button class="btn-ghost" onclick="showToast('Follow feature coming soon!','success')">🤍 Follow Playlist</button>`;
+
+  // Track count
+  document.getElementById("playlistTrackCount").textContent = `${songs.length} Song${songs.length !== 1 ? "s" : ""}`;
+
+  // Track list
+  const trackList = document.getElementById("playlistTrackList");
+  if (!songs.length) {
+    trackList.innerHTML = renderEmptyState("🎵", "No songs yet",
+      isOwner ? "Add songs to your playlist." : "This playlist is empty.",
+      isOwner ? `<button class="btn-primary" onclick="openAddToPlaylistModal()">Add Song</button>` : "");
+  } else {
+    trackList.innerHTML = `<div class="track-list">${songs.map((s,i) => `
+      <div class="track-item">
+        <span class="track-num">${i+1}</span>
+        <div class="track-art">${s.emoji}</div>
+        <div class="track-info">
+          <div class="track-name">${escHtml(s.title)}</div>
+          <div class="track-artist">${escHtml(s.artistName)}</div>
+        </div>
+        <span class="track-duration">${s.duration||"—"}</span>
+        <div class="track-actions">
+          ${renderStreamingLinks(s.streamingLinks)}
+          <button class="track-btn" onclick="toggleFav('${s.id}',this)">${MU6Store.isFavorite(s.id)?"❤️":"🤍"}</button>
+        </div>
+      </div>`).join("")}</div>`;
+  }
+
+  // Info sidebar
+  const created = new Date(playlist.createdAt).toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
+  document.getElementById("playlistDetailInfo").innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:13px">
+      <span style="color:var(--text-muted)">Created</span>
+      <span>${created}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px">
+      <span style="color:var(--text-muted)">Category</span>
+      <span style="text-transform:capitalize">${playlist.category}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px">
+      <span style="color:var(--text-muted)">Curator</span>
+      <span>${escHtml(playlist.ownerName)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px">
+      <span style="color:var(--text-muted)">Tracks</span>
+      <span>${songs.length}</span>
+    </div>`;
+
+  history.pushState(null, "", `playlists.html?id=${playlistId}`);
+}
+
+/* ---- Create Playlist Modal ---- */
+function openCreatePlaylistModal() {
+  const user = MU6Store.currentUser();
+  if (!user) { openModal("loginModal"); return; }
+
+  let modal = document.getElementById("createPlaylistModal");
+  if (modal) modal.remove();
+  modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.id = "createPlaylistModal";
+  const cats = ["community","curated","genre"];
+  modal.innerHTML = `
+    <div class="modal glass">
+      <button class="modal-close" onclick="closeModal('createPlaylistModal')">✕</button>
+      <h2>Create Playlist</h2>
+      <p class="modal-sub">Curate the perfect collection of music</p>
+      <form class="modal-form" id="createPlaylistForm">
+        <div class="form-group">
+          <label>Playlist Name *</label>
+          <input type="text" name="title" placeholder="e.g. Late Night Drives" required />
+        </div>
+        <div class="form-group">
+          <label>Description <span style="color:var(--text-muted)">(optional)</span></label>
+          <textarea name="description" rows="3" placeholder="What's this playlist about?" style="background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:12px 16px;color:var(--text-primary);font-size:15px;outline:none;resize:vertical;width:100%"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" style="background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:12px 16px;color:var(--text-primary);font-size:15px;outline:none;width:100%">
+            ${cats.map(c => `<option value="${c}" style="text-transform:capitalize">${c.charAt(0).toUpperCase()+c.slice(1)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Emoji / Icon</label>
+          <input type="text" name="emoji" placeholder="🎧" maxlength="4" />
+        </div>
+        <button type="submit" class="btn-primary full-width">Create Playlist</button>
+      </form>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal("createPlaylistModal"); });
+  document.getElementById("createPlaylistForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+    const title = form.querySelector('[name="title"]').value.trim();
+    const description = form.querySelector('[name="description"]').value.trim();
+    const category = form.querySelector('[name="category"]').value;
+    const emoji = form.querySelector('[name="emoji"]').value.trim() || "🎧";
+    const result = MU6Store.createPlaylist({ title, description, category, emoji });
+    if (result.ok) {
+      closeModal("createPlaylistModal");
+      showToast("Playlist created! 🎧", "success");
+      form.reset();
+      showPlaylistDetail(result.playlist.id);
+    } else {
+      showToast(result.error, "error");
+    }
+  });
+  openModal("createPlaylistModal");
+}
+
+/* ---- Add Song to Playlist Modal ---- */
+function openAddToPlaylistModal() {
+  const user = MU6Store.currentUser();
+  if (!user) { openModal("loginModal"); return; }
+  if (!_currentPlaylistId) return;
+
+  const playlist = MU6Store.getPlaylist(_currentPlaylistId);
+  if (!playlist || playlist.ownerId !== user.id) {
+    showToast("You can only add songs to your own playlists.", "error");
+    return;
+  }
+
+  const allSongs = MU6Store.getSongs();
+  const existing = new Set(playlist.songs);
+
+  let modal = document.getElementById("addToPlaylistModal");
+  if (modal) modal.remove();
+  modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.id = "addToPlaylistModal";
+
+  const songOptions = allSongs.length
+    ? allSongs.map(s => `
+        <div class="track-item" style="cursor:pointer;border-radius:var(--radius-md);padding:10px 12px;${existing.has(s.id)?"opacity:0.4;pointer-events:none":""}"
+          onclick="addSongToCurrentPlaylist('${s.id}',this)">
+          <div class="track-art">${s.emoji}</div>
+          <div class="track-info">
+            <div class="track-name">${escHtml(s.title)}</div>
+            <div class="track-artist">${escHtml(s.artistName)}</div>
+          </div>
+          ${existing.has(s.id) ? '<span style="font-size:12px;color:var(--text-muted)">Added</span>' : '<button class="btn-outline" style="padding:6px 14px;font-size:12px">Add</button>'}
+        </div>`).join("")
+    : `<p style="color:var(--text-muted);text-align:center;padding:20px">No songs available. <a href="artists.html" style="color:var(--purple-light)">Add songs first</a>.</p>`;
+
+  modal.innerHTML = `
+    <div class="modal glass" style="max-width:520px;max-height:80vh;overflow-y:auto">
+      <button class="modal-close" onclick="closeModal('addToPlaylistModal')">✕</button>
+      <h2>Add to Playlist</h2>
+      <p class="modal-sub">${escHtml(playlist.title)}</p>
+      <div class="search-wrapper" style="margin-bottom:16px">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="addSongSearch" placeholder="Search songs…" oninput="filterAddSongList()" />
+      </div>
+      <div id="addSongList">${songOptions}</div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal("addToPlaylistModal"); });
+  openModal("addToPlaylistModal");
+}
+
+function filterAddSongList() {
+  const q = document.getElementById("addSongSearch")?.value.toLowerCase() || "";
+  const playlist = MU6Store.getPlaylist(_currentPlaylistId);
+  const existing = new Set(playlist?.songs || []);
+  const songs = MU6Store.getSongs().filter(s => !q || s.title.toLowerCase().includes(q) || s.artistName.toLowerCase().includes(q));
+  document.getElementById("addSongList").innerHTML = songs.length
+    ? songs.map(s => `
+        <div class="track-item" style="cursor:pointer;border-radius:var(--radius-md);padding:10px 12px;${existing.has(s.id)?"opacity:0.4;pointer-events:none":""}"
+          onclick="addSongToCurrentPlaylist('${s.id}',this)">
+          <div class="track-art">${s.emoji}</div>
+          <div class="track-info">
+            <div class="track-name">${escHtml(s.title)}</div>
+            <div class="track-artist">${escHtml(s.artistName)}</div>
+          </div>
+          ${existing.has(s.id) ? '<span style="font-size:12px;color:var(--text-muted)">Added</span>' : '<button class="btn-outline" style="padding:6px 14px;font-size:12px">Add</button>'}
+        </div>`).join("")
+    : `<p style="color:var(--text-muted);text-align:center;padding:20px">No songs found.</p>`;
+}
+
+function addSongToCurrentPlaylist(songId, row) {
+  const result = MU6Store.addSongToPlaylist(_currentPlaylistId, songId);
+  if (result.ok) {
+    row.style.opacity = "0.4";
+    row.style.pointerEvents = "none";
+    const btn = row.querySelector(".btn-outline");
+    if (btn) btn.textContent = "Added";
+    showToast("Song added to playlist! 🎵", "success");
+    showPlaylistDetail(_currentPlaylistId);
+  } else {
+    showToast(result.error, "error");
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "mu6",
+  "version": "1.0.0",
+  "description": "MU6 – Next-generation music discovery platform",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev . --port 3000",
+    "deploy": "wrangler pages deploy .",
+    "deploy:preview": "wrangler pages deploy . --branch preview"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

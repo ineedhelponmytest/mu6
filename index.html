@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MU6 – Discover Your Next Favorite Sound</title>
+  <meta name="description" content="MU6 is the next-generation music discovery platform. Find new artists, albums, and genres. Explore by mood, era, color, and more." />
+  <meta name="keywords" content="music discovery, find new music, artists, albums, playlists, genres, indie music" />
+  <meta name="author" content="MU6" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mu6.pages.dev/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mu6.pages.dev/" />
+  <meta property="og:title" content="MU6 – Discover Your Next Favorite Sound" />
+  <meta property="og:description" content="Explore millions of artists, albums, and genres. Find music that moves you." />
+  <meta property="og:image" content="https://mu6.pages.dev/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MU6 – Discover Your Next Favorite Sound" />
+  <meta name="twitter:description" content="Explore millions of artists, albums, and genres. Find music that moves you." />
+  <meta name="twitter:image" content="https://mu6.pages.dev/og-image.png" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-mu">MU</span><span class="logo-6">6</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="discover.html">Discover</a></li>
+      <li><a href="artists.html">Artists</a></li>
+      <li><a href="playlists.html">Playlists</a></li>
+      <li><a href="community.html">Community</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="openModal('loginModal')">Log In</button>
+      <button class="btn-primary" onclick="openModal('signupModal')">Sign Up</button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero" id="hero">
+  <canvas id="particleCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge">✦ New Releases Every Friday</div>
+    <h1 class="hero-title">
+      Discover Your<br/>
+      <span class="gradient-text">Next Favorite</span><br/>
+      Sound
+    </h1>
+    <p class="hero-subtitle">Explore millions of artists, albums, and genres. Find music that moves you.</p>
+    <div class="hero-search">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="heroSearch" placeholder="Search artists, songs, albums, genres…" autocomplete="off" />
+        <button class="search-btn" onclick="handleSearch()">Search</button>
+      </div>
+      <div class="search-tags">
+        <span class="tag" onclick="quickSearch('lo-fi')">Lo-Fi</span>
+        <span class="tag" onclick="quickSearch('indie rock')">Indie Rock</span>
+        <span class="tag" onclick="quickSearch('jazz')">Jazz</span>
+        <span class="tag" onclick="quickSearch('electronic')">Electronic</span>
+        <span class="tag" onclick="quickSearch('hip-hop')">Hip-Hop</span>
+        <span class="tag" onclick="quickSearch('ambient')">Ambient</span>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" data-stat="artists">0</span><span class="stat-label">Artists</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num" data-stat="tracks">0</span><span class="stat-label">Tracks</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num" data-stat="playlists">0</span><span class="stat-label">Playlists</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="vinyl-container">
+      <div class="vinyl" id="vinyl">
+        <div class="vinyl-label">
+          <span class="vinyl-logo">MU6</span>
+        </div>
+      </div>
+      <div class="vinyl-glow"></div>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>Scroll to explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ===== TRENDING SECTION ===== -->
+<section class="section trending-section" id="trending">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">🔥 Right Now</span>
+        <h2 class="section-title">Trending This Week</h2>
+      </div>
+      <div class="tab-group">
+        <button class="tab active" data-tab="artists">Artists</button>
+        <button class="tab" data-tab="songs">Songs</button>
+        <button class="tab" data-tab="albums">Albums</button>
+        <button class="tab" data-tab="discoveries">Discoveries</button>
+      </div>
+    </div>
+
+    <!-- Trending Artists -->
+    <div class="tab-content active" id="tab-artists">
+      <div class="cards-grid" id="trendingArtistsGrid"></div>
+    </div>
+
+    <!-- Trending Songs -->
+    <div class="tab-content" id="tab-songs">
+      <div class="track-list" id="trendingSongsList"></div>
+    </div>
+
+    <!-- Trending Albums -->
+    <div class="tab-content" id="tab-albums">
+      <div class="cards-grid" id="trendingAlbumsGrid"></div>
+    </div>
+
+    <!-- Weekly Discoveries -->
+    <div class="tab-content" id="tab-discoveries">
+      <div class="discoveries-grid" id="discoveriesGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GENRE EXPLORATION ===== -->
+<section class="section genre-section" id="genres">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">🎵 Explore</span>
+        <h2 class="section-title">Browse by Genre</h2>
+      </div>
+      <a href="discover.html" class="btn-outline">View All Genres</a>
+    </div>
+    <div class="genre-grid" id="genreGrid"></div>
+  </div>
+</section>
+
+<!-- ===== MOOD SECTION ===== -->
+<section class="section mood-section" id="moods">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">💫 Vibe Check</span>
+        <h2 class="section-title">Discover by Mood</h2>
+      </div>
+    </div>
+    <div class="mood-grid" id="moodGrid"></div>
+  </div>
+</section>
+
+<!-- ===== FEATURED PLAYLISTS ===== -->
+<section class="section playlists-section" id="playlists">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">🎧 Curated</span>
+        <h2 class="section-title">Featured Playlists</h2>
+      </div>
+      <a href="playlists.html" class="btn-outline">See All</a>
+    </div>
+    <div class="playlist-tabs">
+      <button class="ptab active" data-ptab="curated">Curated</button>
+      <button class="ptab" data-ptab="community">Community</button>
+      <button class="ptab" data-ptab="newreleases">New Releases</button>
+      <button class="ptab" data-ptab="genre">Genre Picks</button>
+    </div>
+    <div class="playlists-grid" id="playlistsGrid"></div>
+  </div>
+</section>
+
+<!-- ===== DISCOVERY FEATURES ===== -->
+<section class="section features-section" id="features">
+  <div class="container">
+    <div class="section-header centered">
+      <span class="section-label">⚡ Powered by MU6</span>
+      <h2 class="section-title">Discover Like Never Before</h2>
+      <p class="section-desc">Our intelligent discovery engine helps you find music you'll love, from hidden gems to global hits.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card glass">
+        <div class="feature-icon">🎲</div>
+        <h3>Random Explorer</h3>
+        <p>Spin the wheel and discover completely random music from any corner of the world.</p>
+        <a href="discover.html#random" class="feature-link">Try it →</a>
+      </div>
+      <div class="feature-card glass">
+        <div class="feature-icon">💎</div>
+        <h3>Hidden Gems</h3>
+        <p>Uncover underrated artists and tracks that deserve way more attention.</p>
+        <a href="discover.html#gems" class="feature-link">Explore →</a>
+      </div>
+      <div class="feature-card glass">
+        <div class="feature-icon">🗺️</div>
+        <h3>Genre Map</h3>
+        <p>Navigate an interactive map of music genres and their relationships.</p>
+        <a href="discover.html#map" class="feature-link">Open Map →</a>
+      </div>
+      <div class="feature-card glass">
+        <div class="feature-icon">📅</div>
+        <h3>Era Browser</h3>
+        <p>Travel through decades of music history and discover era-defining sounds.</p>
+        <a href="discover.html#eras" class="feature-link">Time Travel →</a>
+      </div>
+      <div class="feature-card glass">
+        <div class="feature-icon">🎨</div>
+        <h3>Color Discovery</h3>
+        <p>Find music that matches a color palette — synesthesia for your ears.</p>
+        <a href="discover.html#colors" class="feature-link">Pick Colors →</a>
+      </div>
+      <div class="feature-card glass">
+        <div class="feature-icon">🏆</div>
+        <h3>Daily Challenge</h3>
+        <p>Complete daily music discovery challenges and earn badges.</p>
+        <a href="discover.html#challenge" class="feature-link">Start Today →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMMUNITY SECTION ===== -->
+<section class="section community-section" id="community">
+  <div class="container">
+    <div class="community-banner glass">
+      <div class="community-text">
+        <span class="section-label">👥 Community</span>
+        <h2>Join Other Music Explorers</h2>
+        <p>Share discoveries, write reviews, build playlists, and connect with people who love music as much as you do.</p>
+        <div class="community-actions">
+          <button class="btn-primary" onclick="openModal('signupModal')">Join MU6 Free</button>
+          <a href="community.html" class="btn-ghost">Explore Community</a>
+        </div>
+      </div>
+      <div class="community-visual">
+        <div class="avatar-stack" id="avatarStack"></div>
+        <div class="community-stats-mini">
+          <div class="mini-stat"><span id="communityReviewCount">0</span> Reviews</div>
+          <div class="mini-stat"><span id="communityPlaylistCount">0</span> Playlists</div>
+          <div class="mini-stat"><span id="communityMemberCount">0</span> Members</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo">
+          <span class="logo-mu">MU</span><span class="logo-6">6</span>
+        </a>
+        <p>The next-generation music discovery platform. Find your sound.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Twitter">𝕏</a>
+          <a href="#" class="social-link" aria-label="Instagram">📸</a>
+          <a href="#" class="social-link" aria-label="Discord">💬</a>
+          <a href="#" class="social-link" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Discover</h4>
+        <ul>
+          <li><a href="discover.html">Discovery Engine</a></li>
+          <li><a href="discover.html#genres">Genre Browser</a></li>
+          <li><a href="discover.html#moods">Mood Browser</a></li>
+          <li><a href="discover.html#eras">Era Browser</a></li>
+          <li><a href="discover.html#gems">Hidden Gems</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="community.html">Reviews</a></li>
+          <li><a href="community.html#discussions">Discussions</a></li>
+          <li><a href="playlists.html">Playlists</a></li>
+          <li><a href="community.html#challenges">Challenges</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="#" onclick="openModal('loginModal')">Log In</a></li>
+          <li><a href="#" onclick="openModal('signupModal')">Sign Up</a></li>
+          <li><a href="#">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MU6. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal glass">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <div class="modal-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></div>
+    <h2>Welcome Back</h2>
+    <p class="modal-sub">Log in to continue your music journey</p>
+    <form class="modal-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn-primary full-width">Log In</button>
+    </form>
+    <p class="modal-switch">Don't have an account? <a href="#" onclick="switchModal('loginModal','signupModal')">Sign Up</a></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="signupModal">
+  <div class="modal glass">
+    <button class="modal-close" onclick="closeModal('signupModal')">✕</button>
+    <div class="modal-logo"><span class="logo-mu">MU</span><span class="logo-6">6</span></div>
+    <h2>Join MU6</h2>
+    <p class="modal-sub">Start discovering music you'll love</p>
+    <form class="modal-form" onsubmit="handleSignup(event)">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" placeholder="musiclover42" required />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn-primary full-width">Create Account</button>
+    </form>
+    <p class="modal-switch">Already have an account? <a href="#" onclick="switchModal('signupModal','loginModal')">Log In</a></p>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+  /* Register Service Worker */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+  }
+  /* Update community stats from live data */
+  document.addEventListener("DOMContentLoaded", () => {
+    const stats = MU6Store.getSiteStats();
+    const rEl = document.getElementById("communityReviewCount");
+    const pEl = document.getElementById("communityPlaylistCount");
+    const mEl = document.getElementById("communityMemberCount");
+    if (rEl) rEl.textContent = formatCount(stats.reviews);
+    if (pEl) pEl.textContent = formatCount(stats.playlists);
+    if (mEl) mEl.textContent = formatCount(stats.users);
+  });
+</script>
+</body>
+</html>

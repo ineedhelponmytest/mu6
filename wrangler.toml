@@ -1,0 +1,13 @@
+name = "mu6"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+[vars]
+ENVIRONMENT = "production"
+
+# KV Namespaces (create these with: wrangler kv:namespace create "MU6_DATA")
+# After creating, replace the id values below with your actual namespace IDs
+# [[kv_namespaces]]
+# binding = "MU6_DATA"
+# id = "YOUR_KV_NAMESPACE_ID"
+# preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID"
