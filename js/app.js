@@ -132,12 +132,12 @@ document.addEventListener("click", e => {
 });
 
 /* ---- Auth handlers ---- */
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const form = e.target;
   const email = form.querySelector('[type="email"]').value.trim();
   const password = form.querySelector('[type="password"]').value;
-  const result = MU6Store.login({ email, password });
+  const result = await MU6API.login(email, password);
   if (result.ok) {
     closeModal("loginModal");
     showToast("Welcome back, " + result.user.username + "! 🎵", "success");
@@ -148,7 +148,7 @@ function handleLogin(e) {
   }
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
   e.preventDefault();
   const form = e.target;
   const inputs = form.querySelectorAll("input");
@@ -156,7 +156,7 @@ function handleSignup(e) {
   const email = inputs[1].value.trim();
   const password = inputs[2].value;
   if (password.length < 6) { showToast("Password must be at least 6 characters.", "error"); return; }
-  const result = MU6Store.register({ username, email, password });
+  const result = await MU6API.register(username, email, password);
   if (result.ok) {
     closeModal("signupModal");
     showToast("Welcome to MU6, " + result.user.username + "! 🎉", "success");
